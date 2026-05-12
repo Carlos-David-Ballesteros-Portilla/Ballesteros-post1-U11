@@ -1,6 +1,7 @@
 package com.empresa.catalogo.service;
 
 import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.empresa.catalogo.dto.ProductoRequestDTO;
@@ -21,21 +22,25 @@ public class ProductoServiceImpl implements ProductoService {
         this.factory = factory;
     }
 
+    @Override
     public ProductoResponseDTO crear(ProductoRequestDTO dto) {
         Producto p = factory.toEntity(dto);
         return factory.toResponseDTO(repo.save(p));
     }
 
+    @Override
     public ProductoResponseDTO buscarPorId(Long id) {
         Producto p = repo.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Producto", id));
         return factory.toResponseDTO(p);
     }
 
+    @Override
     public List<ProductoResponseDTO> listarActivos() {
         return repo.findByActivoTrue().stream()
                 .map(factory::toResponseDTO).toList();
     }
 
+    @Override
     public void eliminar(Long id) {
         buscarPorId(id); // verifica existencia
         repo.deleteById(id);

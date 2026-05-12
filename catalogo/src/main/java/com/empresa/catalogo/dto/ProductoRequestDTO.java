@@ -10,7 +10,7 @@ public class ProductoRequestDTO {
     private Double precio;
     private String categoria;
 // getters y setters
-
+    
     public String getNombre() {
         return nombre;
     }
