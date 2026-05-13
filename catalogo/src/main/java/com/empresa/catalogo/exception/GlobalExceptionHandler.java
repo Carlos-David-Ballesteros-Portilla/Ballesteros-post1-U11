@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleNotFound(RecursoNoEncontradoException ex,
             HttpServletRequest req) {
-        return new ApiError(404, "Not Found", ex.getMessage(),req.getRequestURI());
+        return new ApiError(404, "Not Found", ex.getMessage(), req.getRequestURI());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -27,12 +27,14 @@ public class GlobalExceptionHandler {
         String errores = ex.getBindingResult().getFieldErrors().stream()
                 .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
                 .collect(Collectors.joining("; "));
-        return new ApiError(400, "Bad Request", errores,req.getRequestURI());
+        return new ApiError(400, "Bad Request", errores, req.getRequestURI());
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handleGeneral(Exception ex, HttpServletRequest req) {
-        return new ApiError(500, "Internal Server Error","Error inesperado. Contactar soporte.",req.getRequestURI());
+        ex.printStackTrace(); // ← agrega esta línea temporalmente
+        return new ApiError(500, "Internal Server Error", "Error inesperado. Contactar soporte.", req.getRequestURI());
     }
 }
+

@@ -2,6 +2,8 @@ package com.empresa.catalogo.service;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.empresa.catalogo.dto.ProductoRequestDTO;
@@ -14,6 +16,8 @@ import com.empresa.catalogo.repository.ProductoRepository;
 @Service
 public class ProductoServiceImpl implements ProductoService {
 
+    private static final Logger log = LoggerFactory.getLogger(ProductoServiceImpl.class);
+
     private final ProductoRepository repo;
     private final ProductoFactory factory;
 
@@ -24,25 +28,36 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     public ProductoResponseDTO crear(ProductoRequestDTO dto) {
+        log.info("Creando producto: nombre={}, categoria={}", dto.getNombre(), dto.getCategoria());
         Producto p = factory.toEntity(dto);
-        return factory.toResponseDTO(repo.save(p));
+        ProductoResponseDTO resp = factory.toResponseDTO(repo.save(p));
+        log.info("Producto creado exitosamente con id={}", resp.getId());
+        return resp;
     }
 
     @Override
     public ProductoResponseDTO buscarPorId(Long id) {
-        Producto p = repo.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Producto", id));
+        log.debug("Buscando producto con id={}", id);
+        Producto p = repo.findById(id).orElseThrow(() -> {
+            log.warn("Producto con id={} no encontrado", id);
+            return new RecursoNoEncontradoException("Producto", id);
+        });
         return factory.toResponseDTO(p);
     }
 
     @Override
     public List<ProductoResponseDTO> listarActivos() {
+        log.info("Listando todos los productos activos");
         return repo.findByActivoTrue().stream()
-                .map(factory::toResponseDTO).toList();
+                .map(factory::toResponseDTO)
+                .toList();
     }
 
     @Override
     public void eliminar(Long id) {
-        buscarPorId(id); // verifica existencia
+        log.info("Eliminando producto con id={}", id);
+        buscarPorId(id);
         repo.deleteById(id);
+        log.info("Producto con id={} eliminado correctamente", id);
     }
 }
