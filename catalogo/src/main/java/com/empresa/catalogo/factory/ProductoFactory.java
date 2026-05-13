@@ -23,5 +23,6 @@ public class ProductoFactory {
         dto.setPrecio(p.getPrecio());
         dto.setCategoria(p.getCategoria());
         return dto;
+        
     }
 }
